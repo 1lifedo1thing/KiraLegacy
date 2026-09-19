@@ -1,0 +1,9 @@
+Package: ru.computershik.kiralegacy
+Name: KiraLegacy
+Version: 1.0
+Architecture: iphoneos-arm
+Description: Клиент для просмотра аниме из разных источников, для iOS 5.1 и новее
+Maintainer: Computershik
+Author: Computershik
+Section: Multimedia
+Depends: firmware (>= 5.1)

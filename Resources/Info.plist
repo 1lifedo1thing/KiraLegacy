@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>ru</string>
+	<!--
+	    Языки, на которых приложение умеет говорить.
+
+	    Само приложение русское и ничего не переводит, так что список выглядит
+	    формальностью — но от него зависит клавиатура. iOS 6 отдаёт приложению
+	    не все включённые в системе клавиатуры, а только те, чей язык оно
+	    объявило; не объявившему не достаётся ничего, кроме английской
+	    по умолчанию. Глобус при этом не рисуется вовсе: переключать не на что.
+
+	    Для поиска аниме это важнее, чем кажется: названия почти всегда
+	    латиницей, и без английской раскладки искать было бы нечем.
+
+	    Объявляется двумя способами сразу, и оба нужны: ключ здесь и папки
+	    ru.lproj / en.lproj в связке — iOS ищет и то, и другое.
+	-->
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>ru</string>
+		<string>en</string>
+		<string>es</string>
+		<string>pt</string>
+		<string>ja</string>
+		<string>zh-Hans</string>
+	</array>
+	<!--
+	    Имя под значком — «Кира», а не «KiraLegacy».
+
+	    Домашний экран отводит подписи около одиннадцати знаков и всё сверх
+	    того обрезает многоточием: «KiraLegac…». Полное имя остаётся
+	    в CFBundleName, в control и в названии пакета.
+	-->
+	<key>CFBundleDisplayName</key>
+	<string>Кира</string>
+	<key>CFBundleExecutable</key>
+	<string>KiraLegacy</string>
+	<key>CFBundleIdentifier</key>
+	<string>ru.computershik.kiralegacy</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>KiraLegacy</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
+	<key>MinimumOSVersion</key>
+	<string>5.1</string>
+	<key>UIDeviceFamily</key>
+	<array>
+		<integer>1</integer>
+		<integer>2</integer>
+	</array>
+	<!--
+	    Строка состояния светлая всегда: приложение чёрное целиком, другой
+	    темы у него нет.
+	-->
+	<key>UIStatusBarStyle</key>
+	<string>UIStatusBarStyleBlackOpaque</string>
+	<!--
+	    Стилем строки состояния распоряжается приложение, а не контроллер.
+
+	    С iOS 7 по умолчанию наоборот: система спрашивает preferredStatusBarStyle
+	    у текущего контроллера, а setStatusBarStyle молча ничего не делает.
+	    На iOS 5 и 6 ключа не существует, он там просто не читается, а
+	    setStatusBarStyle работает и без него — то есть путь получается один
+	    на весь поддерживаемый диапазон.
+	-->
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>UIPrerenderedIcon</key>
+	<true/>
+	<key>CFBundleIconFiles</key>
+	<array>
+		<string>Icon-57.png</string>
+		<string>Icon-72.png</string>
+		<string>Icon-76.png</string>
+		<string>Icon-114.png</string>
+		<string>Icon-120.png</string>
+		<string>Icon-144.png</string>
+		<string>Icon-152.png</string>
+		<string>Icon-180.png</string>
+	</array>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<!--
+	    Экраны запуска.
+
+	    Это не украшение: по наличию картинки нужного размера iOS решает,
+	    умеет ли приложение работать на этом экране. Без Default-568h@2x
+	    на iPhone 5 оно запускается в режиме 320x480 — с чёрными полосами
+	    сверху и снизу. На iPhone 4 полос не было просто потому, что там
+	    экран и есть 320x480.
+
+	    Сами файлы с классическими именами нужны для iOS 5 и 6, где этого
+	    списка ещё не понимают; список — для iOS 7 и новее.
+	-->
+	<key>UILaunchImages</key>
+	<array>
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 480}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-568h</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{320, 568}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-667h</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{375, 667}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-736h</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>8.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{414, 736}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-Portrait</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+		</dict>
+		<!--
+		    Планшет лёжа — отдельная картинка, и размер у неё всё равно
+		    записан «стоя»: UILaunchImageSize всегда портретный, положение
+		    задаёт UILaunchImageOrientation. Без этой записи iOS считает,
+		    что лёжа приложение работать не умеет, — а плеер у нас лёжа
+		    и разворачивается.
+		-->
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-Landscape</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>7.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{768, 1024}</string>
+		</dict>
+		<!--
+		    iPad Pro. Размер здесь всегда в точках, а не в пикселях: 12,9″
+		    это 1024×1366 точек при удвоенном масштабе, то есть 2048×2732
+		    пикселя в файле. Имя даётся без слова про положение — «-Portrait»
+		    и «-Landscape» система дописывает сама по UILaunchImageOrientation,
+		    а «@2x~ipad» по масштабу и виду устройства.
+		-->
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-1112h</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>9.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{834, 1112}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-1112h</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>9.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{834, 1112}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-1366h</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>9.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Portrait</string>
+			<key>UILaunchImageSize</key>
+			<string>{1024, 1366}</string>
+		</dict>
+		<dict>
+			<key>UILaunchImageName</key>
+			<string>Default-1366h</string>
+			<key>UILaunchImageMinimumOSVersion</key>
+			<string>9.0</string>
+			<key>UILaunchImageOrientation</key>
+			<string>Landscape</string>
+			<key>UILaunchImageSize</key>
+			<string>{1024, 1366}</string>
+		</dict>
+	</array>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>armv7</string>
+	</array>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
+
+	<!--
+	  App Transport Security: обычный HTTP разрешён.
+
+	  ATS появилась в iOS 9 и распространяется на приложения, собранные
+	  с её SDK, — наш случай. Она запрещает незашифрованные соединения,
+	  и первым под запрет попадает наш же прокси: плееру он отдаёт видео
+	  по http://127.0.0.1, потому что шифровать петлю не от кого и незачем.
+	  Со стороны это выглядит как «kCFErrorDomainCFNetwork error -1022»
+	  на iOS 9, при том что остальное приложение работает — наружу оно и так
+	  ходит по HTTPS.
+
+	  Точечного исключения хватило бы не всякого: NSExceptionDomains
+	  сопоставляется с доменными именами, а числовой адрес в нём не работает.
+	  Переводить прокси на localhost ради этого значило бы гонять запросы
+	  через разрешение имён на каждом куске потока.
+
+	  Опасности в разрешении нет: наружу приложение ходит только по HTTPS
+	  и только через KLHttp, где проверка сертификата к тому же строже
+	  системной — там свои корни. Незашифрованным остаётся ровно одно
+	  соединение, и оно не покидает устройство.
+	-->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

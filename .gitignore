@@ -1,0 +1,10 @@
+.theos/
+packages/
+*.ipa
+*.deb
+__pycache__/
+.DS_Store
+
+# Исходное видео, из которого взят значок: 83 МБ, а для сборки не нужно —
+# нужные куски лежат в tools/icon-eye.png и tools/launch-frame.png.
+generatedvideo.mp4
