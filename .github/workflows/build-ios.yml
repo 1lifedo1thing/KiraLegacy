@@ -104,7 +104,10 @@ jobs:
       - name: 补上 SDK 里缺失的字符串函数符号
         run: |
           TBD="$THEOS/sdks/iPhoneOS9.3.sdk/usr/lib/system/libsystem_c.tbd"
-          ARCHS="armv7 arm64"
+          # 必须是 YAML 序列，不是裸字符串 —— 写成 "armv7 arm64" 的话
+          # 链接器会把整个 .tbd 判为 malformed: not a sequence。
+          # 取值与 patch-sdk.sh 里的 ARCHS 保持一致。
+          ARCHS="[ armv7, armv7s, arm64, i386, x86_64 ]"
           missing=""
 
           # 按词边界判断，避免匹配到 __platform_strchr 这类名字
