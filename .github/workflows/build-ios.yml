@@ -73,7 +73,27 @@ jobs:
 
       # Theos、工具链、iPhoneOS9.3.sdk、四处 SDK 补丁、OpenSSL 双切片
       - name: 准备环境
-        run: sh tools/setup.sh
+        run: |
+          set -o pipefail
+
+          if sh tools/setup.sh; then
+            exit 0
+          fi
+
+          # 工具链里的 ar 是带 program-prefix 的 GNU ar：建符号表时它会去找
+          # 同前缀的 ranlib，而包里只有不带前缀的那个。于是 OpenSSL 编到
+          # 「打包静态库」那一步就断，报的是：
+          #   ar: can't find or exec: .../aarch64-apple-darwin14-ranlib
+          # 补上这个缺失的别名再跑一次；setup.sh 幂等，已装好的部分会跳过，
+          # 只会重做失败的 OpenSSL。
+          BIN="$THEOS/toolchain/linux/iphone/bin"
+          if [ -d "$BIN" ] && [ ! -e "$BIN/aarch64-apple-darwin14-ranlib" ]; then
+            echo "补上工具链缺失的 ranlib 别名"
+            ln -sf ranlib "$BIN/aarch64-apple-darwin14-ranlib"
+            sh tools/setup.sh
+          else
+            exit 1
+          fi
 
       - name: 编译并打包
         run: make package ipa
