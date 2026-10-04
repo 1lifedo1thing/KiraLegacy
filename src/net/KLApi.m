@@ -4,8 +4,10 @@
 
 #import "KLAnime.h"
 #import "KLEpisode.h"
+#import "KLCustomProvider.h"
 #import "KLHttp.h"
 #import "KLJson.h"
+#import "KLSettings.h"
 #import "KLSource.h"
 
 static NSString *const KLAniList = @"https://graphql.anilist.co";
@@ -739,6 +741,30 @@ static const NSTimeInterval KLMirrorPatience = 2.5;
     [asking addObject:[^KLSource *{
         return [self resolver:slug episode:episode kind:lang];
     } copy]];
+
+    /**
+     * Свои источники — в конце списка, но в том же опросе.
+     *
+     * В конце, а не в начале: штатные зеркала, когда они живы, дают больше —
+     * мастер-плейлист с лестницей качеств и дорожку субтитров. Пока они
+     * отвечают, порядок ни на что не влияет, а когда перестанут — их в списке
+     * просто не будет, и свои окажутся первыми сами собой.
+     *
+     * Кому нужно наоборот, тот назначает свой источник умолчанием в
+     * настройках: там свои источники стоят в общем списке, и выбор
+     * по имени имеет силу над порядком.
+     */
+    NSArray *mine = [KLSettings enabledCustomSources];
+
+    for (KLCustomSource *entry in mine) {
+        [asking addObject:[^KLSource *{
+            return [KLCustomProvider sourceFromEntry:entry
+                                           anilistId:anilistId
+                                               malId:malId
+                                             episode:episode
+                                                kind:lang];
+        } copy]];
+    }
 
     /**
      * Спрашиваем всех разом, а не по очереди.

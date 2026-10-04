@@ -1,6 +1,8 @@
 #import "KLSettingsViewController.h"
 
 #import "KLHlsProxy.h"
+#import "KLCustomSource.h"
+#import "KLEditSourceViewController.h"
 #import "KLLog.h"
 #import "KLMetrics.h"
 #import "KLSettings.h"
@@ -199,6 +201,41 @@
                      action:^{ [KLSettings setPreferredSource:label]; [weakSelf rebuild]; }];
     }
 
+    // --- Свои источники ---------------------------------------------------
+    y = [self addHeading:KLStr(@"settings.custom") at:y];
+    y = [self addNote:KLStr(@"settings.custom.note") at:y];
+
+    NSArray *mine = [KLSettings customSources];
+
+    if ([mine count] == 0) {
+        y = [self addNote:KLStr(@"settings.custom.empty") at:y];
+    }
+
+    for (NSInteger i = 0; i < (NSInteger)[mine count]; i++) {
+        KLCustomSource *entry = [mine objectAtIndex:(NSUInteger)i];
+
+        NSMutableString *text = [NSMutableString stringWithFormat:@"%@ · %@",
+                                 [entry name], [entry kindText]];
+
+        if (![entry enabled]) {
+            [text appendString:KLStr(@"custom.off.suffix")];
+        }
+
+        NSInteger index = i;
+
+        // Строка ведёт в правку, а не выбирает источник: выбор умолчания —
+        // выше, в общем списке, где свои источники стоят рядом со штатными.
+        y = [self addOption:text
+                    checked:NO
+                         at:y
+                     action:^{ [weakSelf editCustom:index]; }];
+    }
+
+    y = [self addOption:KLStr(@"settings.custom.add")
+                checked:NO
+                     at:y
+                 action:^{ [weakSelf editCustom:-1]; }];
+
     // --- Качество ---------------------------------------------------------
     y = [self addHeading:KLStr(@"settings.quality") at:y];
     y = [self addNote:KLStr(@"settings.quality.note") at:y];
@@ -267,6 +304,18 @@
     // этого его надо открыть снаружи приложения. Safari по типу
     // содержимого узнаёт профиль и передаёт его установщику.
     [[UIApplication sharedApplication] openURL:url];
+}
+
+#pragma mark - Свои источники
+
+- (void)editCustom:(NSInteger)index {
+    KLEditSourceViewController *screen =
+        [[KLEditSourceViewController alloc] initWithIndex:index];
+
+    __weak KLSettingsViewController *weakSelf = self;
+
+    [screen setOnFinished:^{ [weakSelf rebuild]; }];
+    [KLNav push:screen];
 }
 
 #pragma mark Поворот
