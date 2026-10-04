@@ -95,6 +95,39 @@ jobs:
             exit 1
           fi
 
+      # 项目自己的 patch-sdk.sh 给 libsystem_c.tbd 补了 memset/memcpy 家族，
+      # 却漏了 strchr/strcmp/strncmp —— 成因完全相同：这三个在 iOS 5.1 也
+      # 住在 libsystem_c，新系统里搬去了 libsystem_platform，再由前者导出。
+      # armv7 上 OpenSSL 的静态库确实会调用它们，于是链接阶段报
+      #   Undefined symbols for architecture armv7: "_strchr", "_strcmp", …
+      # 按项目同样的办法补进同一个文件（幂等，重复执行无副作用）。
+      - name: 补上 SDK 里缺失的字符串函数符号
+        run: |
+          TBD="$THEOS/sdks/iPhoneOS9.3.sdk/usr/lib/system/libsystem_c.tbd"
+          ARCHS="armv7 arm64"
+          missing=""
+
+          # 按词边界判断，避免匹配到 __platform_strchr 这类名字
+          for sym in strchr strcmp strncmp; do
+            grep -qE "(^|[^_A-Za-z0-9])_$sym([,]|[[:space:]]|\])" "$TBD" \
+              || missing="$missing _$sym,"
+          done
+
+          if [ -z "$missing" ]; then
+            echo "libsystem_c.tbd: 字符串函数已在，无需改动"
+            exit 0
+          fi
+
+          syms=$(echo "$missing" | sed 's/,$//; s/^ //')
+
+          # 去掉末尾的「...」再追加一段，和 patch-sdk.sh 的做法一致
+          sed '$ d' "$TBD" > "$TBD.new"
+          printf '  - archs:              %s\n    symbols:            [ %s ]\n...\n' \
+            "$ARCHS" "$syms" >> "$TBD.new"
+          mv "$TBD.new" "$TBD"
+
+          echo "libsystem_c.tbd: 补上$missing"
+
       - name: 编译并打包
         run: make package ipa
 
