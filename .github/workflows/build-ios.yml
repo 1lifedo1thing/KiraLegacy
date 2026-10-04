@@ -1,0 +1,106 @@
+# KiraLegacy —— 在 GitHub Actions 上构建 iOS 包
+#
+# 放到仓库的 .github/workflows/build-ios.yml 即生效。
+#
+# 跑在 ubuntu-22.04 上，全程不需要 macOS、Xcode，也不需要苹果开发者证书：
+# Theos 自带 iOS clang 工具链和 ldid，签名走 adhoc。
+#
+# 冷启动约 25–35 分钟（工具链 86 MB、SDK 约 200 MB、OpenSSL 编译 5–10 分钟），
+# 命中缓存后约 3–5 分钟。公开仓库免费，不计入付费分钟数。
+name: Build
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  THEOS: /home/runner/theos
+  SSL_OUT: /home/runner/kiralegacy/out
+  OPENSSL_VERSION: "1.1.1w"
+  # 换工具链或改了 SDK 补丁后，把这个值 +1 可强制重建缓存
+  CACHE_EPOCH: v1
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+
+    steps:
+      - name: 取源码
+        uses: actions/checkout@v4
+
+      # setup.sh 只在「缺工具」时才调 apt，而 runner 上 git/curl/perl/make/
+      # python3/dpkg-deb 本来就有，它会整段跳过安装。所以依赖在这里显式装齐。
+      - name: 安装构建依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential fakeroot rsync curl perl git zip xz-utils \
+            libxml2 dpkg-dev python3 ca-certificates
+          # 工具链的 clang 依赖第五代 ncurses，新发行版里已删除；
+          # 用第六代顶替，这也是 Theos 官方文档给的办法。
+          sudo apt-get install -y libtinfo5 || true
+          if ! ldconfig -p | grep -q 'libtinfo\.so\.5'; then
+            sudo ln -sf /lib/x86_64-linux-gnu/libtinfo.so.6 \
+                        /lib/x86_64-linux-gnu/libtinfo.so.5
+            sudo ldconfig
+          fi
+
+      # 先建目录，否则缓存动作在未命中时会报路径不存在的警告
+      - name: 建好缓存目录
+        run: mkdir -p "$THEOS" "$SSL_OUT"
+
+      - name: 缓存 Theos（工具链 + SDK 9.3 + 补丁）
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.THEOS }}
+          key: theos-${{ runner.os }}-${{ env.CACHE_EPOCH }}
+
+      - name: 缓存 OpenSSL 静态库
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.SSL_OUT }}
+          key: openssl-${{ runner.os }}-${{ env.OPENSSL_VERSION }}-${{ env.CACHE_EPOCH }}
+
+      # Theos、工具链、iPhoneOS9.3.sdk、四处 SDK 补丁、OpenSSL 双切片
+      - name: 准备环境
+        run: sh tools/setup.sh
+
+      - name: 编译并打包
+        run: make package ipa
+
+      # 校验平台、最低版本 5.1 和双摘要签名；失败返回非零，任务直接变红
+      - name: 校验产物
+        run: python3 tools/check-macho.py packages/KiraLegacy.ipa
+
+      - name: 列出产物
+        run: ls -l packages/
+
+      - name: 上传产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: KiraLegacy-${{ github.sha }}
+          path: |
+            packages/KiraLegacy.ipa
+            packages/*.deb
+          if-no-files-found: error
+          # ipa 本身已是 zip，再压一遍没有收益
+          compression-level: 0
+
+      - name: 打标签时附到 Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            packages/KiraLegacy.ipa
+            packages/*.deb
+          generate_release_notes: true
